@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Dates and Times</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <meta name="date" content="2021-04-07" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: middle, center, middle
+
+# Dates &amp; Times 
+
+&lt;br&gt;&lt;br&gt;.large[Maria C. Ramos| Cohort 4: R4DS | 07 Apr 2021]
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;<i class="fas  fa-link "></i>.large[mariacramos.com]
+&lt;br&gt;&lt;br&gt;<i class="fab  fa-twitter "></i>.large[@mariacramosf]
+---
+class: middle, center, center
+
+# Ice Breaker
+
+Two Truths and One Lie
+
+---
+# Outline
+
+* Generalities 
+
+* Dates &amp; Times Data Types
+
+* Common Tasks 
+ 
+ + Create data types
+ + Pull out individual date components (the month, day, or hour)
+ + Round dates
+ + Set date components
+ + Perform arithmetic operations with dates
+ + Work with time zones
+---
+
+# Generalities 
+
+## Package 
+
+
+```r
+library(lubridate)
+```
+
+** not part of the tidyverse **
+
+---
+
+# Date/Times Data Types 
+
+.pull-left[
+1. date
+
+```
+## # A tibble: 1 x 1
+##   `my_date &lt;- ymd("2021-04-07")`
+##   &lt;date&gt;                        
+## 1 2021-04-07
+```
+]
+
+.pull-right[
+2. date-time
+
+```
+## # A tibble: 336,776 x 1
+##    time_hour          
+##    &lt;dttm&gt;             
+##  1 2013-01-01 05:00:00
+##  2 2013-01-01 05:00:00
+##  3 2013-01-01 05:00:00
+##  4 2013-01-01 05:00:00
+##  5 2013-01-01 06:00:00
+##  6 2013-01-01 05:00:00
+##  7 2013-01-01 06:00:00
+##  8 2013-01-01 06:00:00
+##  9 2013-01-01 06:00:00
+## 10 2013-01-01 06:00:00
+## # … with 336,766 more rows
+```
+]
+
+.center[**Work with the simplest data type you can**]
+
+---
+
+# Creating date and date times
+
+1. From current date or date time&lt;br&gt;
+
+2. From a string&lt;br&gt;
+
+3. From unquoted numbers&lt;br&gt; 
+
+4. From individual date-time components&lt;br&gt;
+
+5. From an existing date, date-time object&lt;br&gt;
+
+---
+# Creating date and date times
+
+## From current date or date time
+
+.pull-left[
+Current date
+
+```r
+*today()
+```
+
+```
+## [1] "2021-04-07"
+```
+]
+
+.pull-right[
+Current date-time
+
+```r
+*now()
+```
+
+```
+## [1] "2021-04-07 17:55:00 -05"
+```
+]
+
+---
+#Creating date and date times
+
+## From strings
+
+**Approach 1: parsing (data import) **
+
+**Approach 2: using lubridate helpers**
+
+- Helpers: y, m, d to represent year, month, day, etc.&lt;br&gt;
+
+- Identify the order in which the components appear in the data &lt;br&gt;
+
+- Specify the order of the components in your data to parse &lt;br&gt;
+
+
+```r
+ymd("2017-01-31")
+```
+
+```
+## [1] "2017-01-31"
+```
+
+```r
+myd("01-2017-31")
+```
+
+```
+## [1] "2017-01-31"
+```
+
+---
+#Creating date and date times
+
+## From strings (examples)
+
+
+```r
+mdy("January 31st, 2017")
+```
+
+```
+## [1] "2017-01-31"
+```
+
+```r
+dmy("31-Jan-2017")
+```
+
+```
+## [1] "2017-01-31"
+```
+
+```r
+ymd_hms("2017-01-31 20:11:59")
+```
+
+```
+## [1] "2017-01-31 20:11:59 UTC"
+```
+
+```r
+mdy_hm("01/31/2017 08:01")
+```
+
+```
+## [1] "2017-01-31 08:01:00 UTC"
+```
+
+---
+# Exercise
+
+Which of helpers will correctly parse the date-time objects?
+
+.pull-left[
+"30/06/2020 06:01:01"
+
+```r
+myd("30/06/2020 06:01")
+mdy_hms("30/06/2020 06:01:01")
+dmy_hms("30/06/2020 06:01:01")
+none of the above
+```
+
+]
+
+.pull-right[
+"April 7, 2021"
+
+```r
+myd_hms("April 7, 2021")
+mdy_hms("April 7, 2021")
+ymd("April 7, 2021")
+none of the above
+```
+]
+---
+#Creating date and date times
+
+## From unquoted number 
+
+
+```r
+ymd(20170131)
+```
+
+```
+## [1] "2017-01-31"
+```
+
+Adding the timezone
+
+```r
+ymd(20170131, tz = "UTC")
+```
+
+```
+## [1] "2017-01-31 UTC"
+```
+
+---
+#Creating date and date times
+
+## From individual components
+
+use *make_date()* and *make_datetime()*
+
+```
+## # A tibble: 336,776 x 6
+##    flight  year month   day  hour minute
+##     &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;
+##  1   1545  2013     1     1     5     15
+##  2   1714  2013     1     1     5     29
+##  3   1141  2013     1     1     5     40
+##  4    725  2013     1     1     5     45
+##  5    461  2013     1     1     6      0
+##  6   1696  2013     1     1     5     58
+##  7    507  2013     1     1     6      0
+##  8   5708  2013     1     1     6      0
+##  9     79  2013     1     1     6      0
+## 10    301  2013     1     1     6      0
+## # … with 336,766 more rows
+```
+
+---
+#Creating date and date times
+
+## From individual components
+
+use *make_date()* and *make_datetime()*
+
+```r
+flights %&gt;%
+   select(flight, year, month, day, hour, minute) %&gt;%
+*  mutate(departure = make_date(year, month, day))%&gt;%
+   print(n=5)
+```
+
+```
+## # A tibble: 336,776 x 7
+##   flight  year month   day  hour minute departure 
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;date&gt;    
+## 1   1545  2013     1     1     5     15 2013-01-01
+## 2   1714  2013     1     1     5     29 2013-01-01
+## 3   1141  2013     1     1     5     40 2013-01-01
+## 4    725  2013     1     1     5     45 2013-01-01
+## 5    461  2013     1     1     6      0 2013-01-01
+## # … with 336,771 more rows
+```
+
+---
+#Creating date and date times
+
+## From an existing date, date-time object
+
+To switch between date and date-time objects
+
+```r
+as_datetime(today())
+```
+
+```
+## [1] "2021-04-07 UTC"
+```
+
+```r
+as_date(now())
+```
+
+```
+## [1] "2021-04-07"
+```
+
+---
+#Pulling out components
+
+.center[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; accessor function &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; year() &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; month() &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; mday() &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; yday() &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; wday() &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; hour() &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; minute() &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; second() &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+#Pulling out components
+
+.pull-left[
+
+```r
+datetime &lt;- 
+   ymd_hms("2021-04-07 12:34:56")
+```
+]
+
+.pull-right[
+
+```r
+year(datetime)
+```
+
+```
+## [1] 2021
+```
+
+```r
+month(datetime)
+```
+
+```
+## [1] 4
+```
+
+```r
+mday(datetime)
+```
+
+```
+## [1] 7
+```
+
+```r
+yday(datetime)
+```
+
+```
+## [1] 97
+```
+
+```r
+wday(datetime)
+```
+
+```
+## [1] 4
+```
+]
+---
+
+#Pulling out components
+
+.pull-left[
+
+```r
+datetime &lt;- 
+   ymd_hms("2021-04-07 12:34:56")
+```
+]
+
+.pull-right[
+
+```r
+month(datetime, 
+*     label = TRUE)
+```
+
+```
+## [1] Apr
+## 12 Levels: Jan &lt; Feb &lt; Mar &lt; Apr &lt; May &lt; Jun &lt; Jul &lt; Aug &lt; Sep &lt; ... &lt; Dec
+```
+
+```r
+wday(datetime, 
+*    label = TRUE,
+*    week_start = 1)
+```
+
+```
+## [1] Wed
+## Levels: Mon &lt; Tue &lt; Wed &lt; Thu &lt; Fri &lt; Sat &lt; Sun
+```
+]
+
+---
+# Rounding Date-times
+
+![rounding_from_cheatsheet](images/rounding.png)
+---
+#Rounding Date-times
+.pull-left[
+![rounding_from_cheatsheet](images/rounding.png)
+]
+
+.pull-right[
+
+```r
+x &lt;- now()
+floor_date(x, "month")
+```
+
+```
+## [1] "2021-04-01 -05"
+```
+
+```r
+round_date(x, "month")
+```
+
+```
+## [1] "2021-04-01 -05"
+```
+
+```r
+ceiling_date(x,"month")
+```
+
+```
+## [1] "2021-05-01 -05"
+```
+
+```r
+rollback(x)
+```
+
+```
+## [1] "2021-03-31 17:55:00 -05"
+```
+
+]
+---
+# Exercises
+.center[
+What should each of these rounding functions output?
+
+```r
+my_date &lt;-  mdy_hms("01-26-2021 16:35:00")
+floor_date(my_date, "hour")
+round_date(my_date, "hour")
+ceiling_date(my_date,"hour")
+rollback(my_date)
+```
+]
+
+---
+# Solutions
+
+
+```r
+my_date &lt;-  mdy_hms("01-26-2021 16:35:00")
+floor_date(my_date, "hour")
+```
+
+```
+## [1] "2021-01-26 16:00:00 UTC"
+```
+
+```r
+round_date(my_date, "hour")
+```
+
+```
+## [1] "2021-01-26 17:00:00 UTC"
+```
+
+```r
+ceiling_date(my_date,"hour")
+```
+
+```
+## [1] "2021-01-26 17:00:00 UTC"
+```
+
+```r
+rollback(my_date)
+```
+
+```
+## [1] "2020-12-31 16:35:00 UTC"
+```
+---
+# Setting components 
+
+Using accessor functions 
+
+*setting the year*
+
+```r
+x
+```
+
+```
+## [1] "2021-04-07 17:55:00 -05"
+```
+
+```r
+*year(x) &lt;- 2020
+x
+```
+
+```
+## [1] "2020-04-07 17:55:00 -05"
+```
+
+*setting the month*
+
+```r
+*month(x) &lt;- month(x)+1
+x
+```
+
+```
+## [1] "2020-05-07 17:55:00 -05"
+```
+
+---
+# Setting components 
+
+Using update() function
+
+*updating year*
+
+```r
+x
+```
+
+```
+## [1] "2020-05-07 17:55:00 -05"
+```
+
+```r
+*update(x, year = 2019)
+```
+
+```
+## [1] "2019-05-07 17:55:00 -05"
+```
+
+```r
+x
+```
+
+```
+## [1] "2020-05-07 17:55:00 -05"
+```
+
+---
+# Setting components 
+
+Using update() function
+
+*using rollover*
+
+```r
+ymd("2021-04-07") %&gt;%
+   update(mday = 31)
+```
+
+```
+## [1] "2021-05-01"
+```
+---
+class: middle, center, center
+#Next Week
+
+Time Spans
+---
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

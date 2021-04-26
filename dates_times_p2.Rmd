@@ -1,0 +1,244 @@
+---
+title: "Dates and Times"
+subtitle: "Maria C. Ramos"
+author: ""
+institute: "Cohort 4: R4DS"
+date: "04/14/2021"
+output:
+  xaringan::moon_reader:
+    seal: FALSE
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: inline
+---
+class: middle, center, middle
+
+# Dates & Times 
+
+<br><br>.large[Maria C. Ramos| Cohort 4: R4DS | 14 Apr 2021]
+
+<br><br><br>`r icon::fa("link")`.large[mariacramos.com]
+<br><br>`r icon::fa("twitter")`.large[@mariacramosf]
+---
+class: middle, center, center
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.retina = 3, warning = FALSE, message = FALSE)
+library(tidyverse)
+```
+# Ice Breaker
+
+
+
+---
+# Outline
+
+* Time Spans 
+ 
+ + Durations
+ + Periods
+ + Intervals
+
+* Time zones
+---
+
+# Durations 
+
+.center[**exact number of seconds**]
+
+Useful to get the difference between two dates
+
+```{r}
+library(lubridate)
+my_time_diff <- today() - ymd(20210413)
+my_time_diff
+```
+
+```{r}
+as.duration(my_time_diff)#<<
+```
+
+---
+# Duration Constructors
+
+.pull-left[
+```{r}
+dseconds(1)
+dminutes(1)
+dhours(1)
+```
+]
+
+.pull-right[
+```{r}
+ddays(1)
+dweeks(1)
+dyears(1)
+```
+]
+
+---
+# Duration Constructors
+
+
+```{r}
+dseconds(c(1, 15))
+dminutes(0:5)
+aux <- c(1,3,5,6)
+dhours(aux)
+```
+
+---
+# Duration Operations
+
+```{r}
+dseconds(15)*2
+dseconds(15)+3
+dyears(1)+dweeks(4)+ddays(7)
+```
+
+---
+# Duration Drawbacks
+
+Be careful with "human" times
+```{r}
+one_pm <- ymd_hms("2016-03-12 13:00:00", tz = "America/New_York")
+
+one_pm
+
+one_pm + ddays(1)
+```
+
+---
+# Periods
+
+.center[**Work with "human" times**]
+
+---
+# Period Constructors 
+
+.pull-left[
+```{r}
+seconds(1)
+minutes(1)
+hours(1)
+```
+]
+
+.pull-right[
+```{r}
+days(1)
+weeks(1)
+months(1)
+years(1)
+```
+]
+---
+# Period Operations
+
+```{r}
+
+days(5)+1
+
+days(5)*5
+
+days(28)+ hours(24) + minutes(30)
+```
+
+---
+# Period Operations
+
+```{r}
+one_pm <- ymd_hms("2016-03-12 13:00:00", tz = "America/New_York")
+
+one_pm
+
+one_pm + days(1)
+```
+
+---
+# Intervals
+
+.center[**Have a starting and ending point**]
+
+```{r}
+years(1)/days(1)
+```
+
+```{r}
+next_year <- today() + years(1)
+(today() %--% next_year)
+(today() %--% next_year) / ddays(1)
+```
+
+---
+# Intervals
+
+```{r}
+ymd(20210413) %--% ymd(20210412)
+```
+
+---
+# Time zones
+
+Get your time zone
+```{r}
+Sys.timezone()
+```
+
+---
+# Time zones 
+Get a complete list of time zone names
+
+```{r}
+head(OlsonNames(), n = 35)
+```
+
+---
+# Time zones 
+
+```{r}
+(x1 <- ymd_hms("2015-06-01 12:00:00", tz = "America/New_York"))
+(x2 <- ymd_hms("2015-06-01 18:00:00", tz = "Europe/Copenhagen"))
+(x3 <- ymd_hms("2015-06-02 04:00:00", tz = "Pacific/Auckland"))
+
+```
+
+```{r}
+x4 <- c(x1, x2, x3)
+x4
+```
+
+---
+# Changing Time Zones
+
+1) Change only the display
+```{r}
+
+x4a <- with_tz(x4, tzone = "Australia/Lord_Howe")#<<
+x4a
+x4a - x4
+
+```
+
+---
+# Changing Time Zones
+
+2) Change the instant in time
+
+```{r}
+x4b <- force_tz(x4, tzone = "Australia/Lord_Howe") #<<
+x4b
+x4b - x4
+```
+
+---
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
